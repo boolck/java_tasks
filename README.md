@@ -1,2 +1,1 @@
-# java_tasks
-implementation of some  functional tasks in Java 
+# Various trivial Java based tasks
