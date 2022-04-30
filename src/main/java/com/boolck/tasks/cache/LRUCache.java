@@ -1,4 +1,4 @@
-package com.kb.challenge.cache;
+package com.boolck.tasks.cache;
 
 import java.util.Map;
 import java.util.Queue;

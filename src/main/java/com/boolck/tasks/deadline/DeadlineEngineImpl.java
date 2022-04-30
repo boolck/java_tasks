@@ -1,4 +1,4 @@
-package com.kb.challenge.deadline;
+package com.boolck.tasks.deadline;
 
 
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 public class DeadlineEngineImpl implements DeadlineEngine{
 
-    private volatile AtomicLong counter;
+    private final AtomicLong counter;
     private final Queue<Pair<Long, Long>> deadlineQueue ;
     private final Map<Long,Pair<Long,Long>> idMap ;
 

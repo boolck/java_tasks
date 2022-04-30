@@ -1,4 +1,4 @@
-package com.kb.challenge.cache;
+package com.boolck.tasks.cache;
 
 
 import org.junit.jupiter.api.BeforeEach;
@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class LRUcacheTest {
+public class LRUCacheTest {
 
     private Cache<String, Integer> cache;
 

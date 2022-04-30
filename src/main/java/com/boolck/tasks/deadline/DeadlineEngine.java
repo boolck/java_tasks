@@ -1,4 +1,4 @@
-package com.kb.challenge.deadline;
+package com.boolck.tasks.deadline;
 
 import java.util.function.Consumer;
 
