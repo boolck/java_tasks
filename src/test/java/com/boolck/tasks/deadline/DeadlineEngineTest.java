@@ -1,4 +1,4 @@
-package com.kb.challenge.deadline;
+package com.boolck.tasks.deadline;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
