@@ -36,7 +36,7 @@ public class DefaultEventBus implements EventBus{
         Class<?> eventType = event.getClass();
 
         for(Map.Entry<Class<?>,Set<ConsumerWithFilter>> entry : filteredSubscribers.entrySet()){
-            if(eventType.isAssignableFrom(entry.getKey())){
+            if(entry.getKey().isAssignableFrom(eventType)){
                 for(ConsumerWithFilter filteredConsumer : entry.getValue()){
                     if(filteredConsumer.getFilter().test(event)){
                         filteredConsumer.getConsumer().accept(event);

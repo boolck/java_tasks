@@ -4,6 +4,7 @@ package com.boolck.tasks.throttler;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SlidingWindowThrottlerTest {
@@ -60,5 +61,36 @@ public class SlidingWindowThrottlerTest {
         Thread.sleep(50);
         assertTrue(testInstance.notifyWhenCanProceed(messageHeld));
 
+    }
+
+    @Test
+    public void testExpiredMessagesDoNotConsumeWindowCapacity() {
+        this.testInstance = new SlidingWindowThrottler(1, 100);
+        long now = System.currentTimeMillis();
+        testInstance.shouldProceed(new Message(now - 1000, "expired"));
+
+        Throttler.ThrottleResult result =
+                testInstance.shouldProceed(new Message(now, "current"));
+
+        assertEquals(Throttler.ThrottleResult.PROCEED, result);
+    }
+
+    @Test
+    public void testAttemptToProceedReportsWhetherCapacityIsAvailable() {
+        this.testInstance = new SlidingWindowThrottler(1, 60000);
+        Message first = new Message(System.currentTimeMillis(), "first");
+        Message second = new Message(System.currentTimeMillis(), "second");
+
+        assertTrue(testInstance.notifyAndAttemptToProceedNow(first, true));
+        assertFalse(testInstance.notifyAndAttemptToProceedNow(second, true));
+    }
+
+    @Test
+    public void testMessageAccessorsAndStringRepresentation() {
+        Message message = new Message(123L, "value");
+
+        assertEquals(123L, message.getEventTimeInmilliseconds());
+        assertEquals("value", message.getValue());
+        assertEquals("Message: value inserted at: 123 ms", message.toString());
     }
 }

@@ -3,7 +3,10 @@ package com.boolck.tasks.movingaverage;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DefaultMovingAverageStoreTest {
     private final static double EPSILON = 0.00001;
@@ -52,5 +55,36 @@ public class DefaultMovingAverageStoreTest {
         assertEquals(50.5,store.getMovingAverage("test"),EPSILON);
         store.addSample("test",51);
         assertEquals(51.0,store.getMovingAverage("test"),EPSILON);
+    }
+
+    @Test
+    public void whenCustomWindowIsFull_ThenOldestSampleIsRemoved() {
+        MovingAverageStore store = new DefaultMovingAverageStore(3);
+        store.addSample("test", 1);
+        store.addSample("test", 2);
+        store.addSample("test", 3);
+        store.addSample("test", 7);
+
+        assertEquals(4.0, store.getMovingAverage("test"), EPSILON);
+    }
+
+    @Test
+    public void whenAllAveragesRequested_ThenSnapshotCannotModifyStore() {
+        MovingAverageStore store = new DefaultMovingAverageStore();
+        store.addSample("first", 10);
+        store.addSample("second", 20);
+
+        Map<String, Double> snapshot = store.getMovingAverages();
+        snapshot.put("first", 100.0);
+
+        assertEquals(Map.of("first", 10.0, "second", 20.0), store.getMovingAverages());
+    }
+
+    @Test
+    public void whenProducerIsNull_ThenOperationsAreRejected() {
+        MovingAverageStore store = new DefaultMovingAverageStore();
+
+        assertThrows(NullPointerException.class, () -> store.addSample(null, 10));
+        assertThrows(NullPointerException.class, () -> store.getMovingAverage(null));
     }
 }

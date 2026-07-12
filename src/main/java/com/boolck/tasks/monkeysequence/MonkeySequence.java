@@ -31,14 +31,20 @@ public class MonkeySequence {
 
     private Thread getMonkeyThread(final char id, final AtomicInteger peachCounter){
         return new Thread(() -> {
-            while (peachCounter.get() < 10) {
-                if (peachCounter.get() % 3 == id-'A') {
-                    System.out.println("Monkey:" + id + " is eating Peach: " + peachCounter.getAndIncrement());
+            while (true) {
+                synchronized (peachCounter) {
+                    int peach = peachCounter.get();
+                    if (peach >= 10) {
+                        return;
+                    }
+                    if (peach % 3 == id-'A') {
+                        System.out.println("Monkey:" + id + " is eating Peach: " + peachCounter.getAndIncrement());
+                    }
                 }
+                Thread.yield();
             }
         });
     }
 }
-
 
 

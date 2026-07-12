@@ -16,7 +16,7 @@ public class DeadlineEngineImpl implements DeadlineEngine{
 
     public DeadlineEngineImpl(){
         counter = new AtomicLong(1);
-        deadlineQueue = new PriorityQueue<>((first,second) -> (int) (first.deadline-second.deadline));
+        deadlineQueue = new PriorityQueue<>((first,second) -> Long.compare(first.deadline, second.deadline));
         idMap = new ConcurrentHashMap<>();
     }
 

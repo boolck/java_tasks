@@ -87,6 +87,11 @@ public class DefaultMovingAverageStore implements MovingAverageStore {
      */
     @Override
     public Map<String, Double> getMovingAverages() {
-        return new HashMap<>(movingAverageMap);
+        try {
+            readLock.lock();
+            return new HashMap<>(movingAverageMap);
+        } finally {
+            readLock.unlock();
+        }
     }
 }

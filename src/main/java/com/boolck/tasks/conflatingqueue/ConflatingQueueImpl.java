@@ -40,10 +40,10 @@ class ConflatingQueueImpl<K, V> implements ConflatingQueue<K, V> {
 
     @Override
     public KeyValue<K, V> take() throws InterruptedException{
+        KeyValue<K,V> polled = this.queue.take();
         lock.lock();
         try{
-            KeyValue<K,V> polled =  this.queue.take();
-            return this.latestMap.get(polled.getKey());
+            return this.latestMap.remove(polled.getKey());
         }
         finally{
             lock.unlock();

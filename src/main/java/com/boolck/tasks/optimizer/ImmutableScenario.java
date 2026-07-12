@@ -57,7 +57,7 @@ public final class ImmutableScenario implements Scenario{
 
     @Override
     public int hashCode() {
-        return Objects.hash(underlyingAsset, bumps, frequency);
+        return Objects.hash(underlyingAsset, new HashSet<>(bumps), frequency);
     }
 
     public static class Builder {
