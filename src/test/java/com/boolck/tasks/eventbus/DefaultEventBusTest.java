@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class DefaultEventBusTest {
@@ -94,5 +95,44 @@ public class DefaultEventBusTest {
         bus.publishEvent(eventZ);
 
         assertEquals(Arrays.asList(eventY,eventZ), eventList);
+    }
+
+    @Test
+    public void whenBaseEventTypeSubscribed_ThenSubtypeEventIsCaptured() throws EventBusException {
+        EventBus bus = new DefaultEventBus();
+        List<Number> numbers = new LinkedList<>();
+        bus.addSubscriber(Number.class, numbers::add);
+
+        bus.publishEvent(10);
+        bus.publishEvent(2.5);
+
+        assertEquals(Arrays.asList(10, 2.5), numbers);
+    }
+
+    @Test
+    public void whenFilterIsNull_ThenSubscriberReceivesAllEvents() throws EventBusException {
+        EventBus bus = new DefaultEventBus();
+        List<String> events = new LinkedList<>();
+        bus.addSubscriberForFilteredEvents(String.class, events::add, null);
+
+        bus.publishEvent("Event A");
+
+        assertEquals(Collections.singletonList("Event A"), events);
+    }
+
+    @Test
+    public void whenEventIsNull_ThenPublishIsRejected() {
+        EventBus bus = new DefaultEventBus();
+
+        assertThrows(EventBusException.class, () -> bus.publishEvent(null));
+    }
+
+    @Test
+    public void whenSubscriberIsNull_ThenRegistrationAndRemovalAreRejected() {
+        EventBus bus = new DefaultEventBus();
+        Consumer<String> subscriber = null;
+
+        assertThrows(EventBusException.class, () -> bus.addSubscriber(String.class, subscriber));
+        assertThrows(EventBusException.class, () -> bus.removeSubscriber(subscriber));
     }
 }

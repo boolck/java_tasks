@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultProbablisticRandomGenTest {
 
@@ -40,5 +41,36 @@ public class DefaultProbablisticRandomGenTest {
         assertEquals(Optional.of(2),Optional.of(freqFirst));
         assertEquals(Optional.of(3),Optional.of(freqSecond));
         assertEquals(Optional.of(5),Optional.of(freqThird));
+    }
+
+    @Test
+    public void testConfiguredValuesAreTheOnlyPossibleResults() {
+        instance = new DefaultProbabilisticRandomGen(List.of(
+                new ProbabilisticRandomGen.NumAndProbability(7, 0.5f),
+                new ProbabilisticRandomGen.NumAndProbability(9, 0.5f)));
+
+        for (int i = 0; i < 1000; i++) {
+            assertTrue(Set.of(7, 9).contains(instance.nextFromSample()));
+        }
+    }
+
+    @Test
+    public void testZeroProbabilityValueIsNeverReturned() {
+        instance = new DefaultProbabilisticRandomGen(List.of(
+                new ProbabilisticRandomGen.NumAndProbability(7, 0.0f),
+                new ProbabilisticRandomGen.NumAndProbability(9, 1.0f)));
+
+        for (int i = 0; i < 1000; i++) {
+            assertEquals(9, instance.nextFromSample());
+        }
+    }
+
+    @Test
+    public void testNumberAndProbabilityAccessors() {
+        ProbabilisticRandomGen.NumAndProbability value =
+                new ProbabilisticRandomGen.NumAndProbability(7, 0.25f);
+
+        assertEquals(7, value.getNumber());
+        assertEquals(0.25f, value.getProbabilityOfSample());
     }
 }

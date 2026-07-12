@@ -4,8 +4,11 @@ package com.boolck.tasks.cache;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class LRUCacheTest {
 
@@ -59,5 +62,48 @@ public class LRUCacheTest {
         cache.get("100", String::length);
         assertEquals(3,cache.get("100"));
         assertEquals(3,cache.get("100", x->x.length()+1));
+    }
+
+    @Test
+    public void testRemoveDeletesEntry() {
+        cache.put("1", 1);
+
+        cache.remove("1");
+
+        assertNull(cache.get("1"));
+    }
+
+    @Test
+    public void testUpdatingEntryRenewsIt() {
+        cache.put("1", 1);
+        cache.put("2", 2);
+
+        cache.put("1", 10);
+        cache.put("3", 3);
+
+        assertEquals(10, cache.get("1"));
+        assertNull(cache.get("2"));
+        assertEquals(3, cache.get("3"));
+    }
+
+    @Test
+    public void testNullMappingResultIsNotCached() {
+        AtomicInteger invocationCount = new AtomicInteger();
+
+        assertNull(cache.get("missing", key -> {
+            invocationCount.incrementAndGet();
+            return null;
+        }));
+        assertNull(cache.get("missing", key -> {
+            invocationCount.incrementAndGet();
+            return null;
+        }));
+
+        assertEquals(2, invocationCount.get());
+    }
+
+    @Test
+    public void testCacheProviderIsSingleton() {
+        assertSame(CacheProvider.getInstance(), CacheProvider.getInstance());
     }
 }

@@ -3,6 +3,9 @@ package com.boolck.tasks.deadline;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DeadlineEngineTest {
@@ -59,5 +62,38 @@ public class DeadlineEngineTest {
         engine.schedule(200);
         engine.poll(250,System.out::println,1);
         assertEquals(1,engine.size());
+    }
+
+    @Test
+    public void testPollReturnsCountAndExpiredRequestIds() {
+        long laterId = engine.schedule(200);
+        long earlierId = engine.schedule(100);
+        List<Long> expiredIds = new ArrayList<>();
+
+        int expired = engine.poll(150, expiredIds::add, 10);
+
+        assertEquals(1, expired);
+        assertEquals(List.of(earlierId), expiredIds);
+        assertEquals(1, engine.size());
+        assertTrue(engine.cancel(laterId));
+    }
+
+    @Test
+    public void testZeroMaxPollLeavesExpiredDeadlinesScheduled() {
+        engine.schedule(100);
+
+        assertEquals(0, engine.poll(100, id -> fail("Handler must not be called"), 0));
+        assertEquals(1, engine.size());
+    }
+
+    @Test
+    public void testDeadlineOrderingDoesNotOverflow() {
+        long laterId = engine.schedule(Long.MAX_VALUE);
+        long earlierId = engine.schedule(0);
+        List<Long> expiredIds = new ArrayList<>();
+
+        assertEquals(1, engine.poll(0, expiredIds::add, 10));
+        assertEquals(List.of(earlierId), expiredIds);
+        assertTrue(engine.cancel(laterId));
     }
 }

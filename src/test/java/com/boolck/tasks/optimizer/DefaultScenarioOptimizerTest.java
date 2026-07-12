@@ -11,6 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class DefaultScenarioOptimizerTest {
 
     @Test
+    public void whenNoScenariosProvided_ThenResultIsEmpty(){
+        ScenarioOptimizer optimizer = new DefaultScenarioOptimizer();
+
+        assertEquals(Collections.emptyList(), optimizer.optimize(Collections.emptyList()));
+    }
+
+    @Test
     public void whenScenarioIsGood_ThenNoOptimization(){
         Scenario scnerio = new ImmutableScenario.Builder("U1").bumps(List.of(1.0,2.0,3.0)).frequency(5).build();
         ScenarioOptimizer optimizer = new DefaultScenarioOptimizer();
